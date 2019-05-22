@@ -1,17 +1,9 @@
-/*jslint browser: true, devel: true*/
-/*global AudioContext, webkitAudioContext, Uint8Array, d3, requestAnimationFrame*/
-
 import heart from './../img/heart.svg'
 import blackHeart from './../img/blackHeart.svg'
 
-export var vizualizer = {
-    audioElement: 0,
-    audioSrc: 0,
-    audioContext: 0,
-    analyser: 0,
-    frequencyData: 0,
-    init: function (id, DataLength) {
-        "use strict";
+export default class Vizualizer {
+
+    constructor(id, dataLength) {
         if (typeof AudioContext !== "undefined") {
             this.audioContext = new AudioContext();
         } else if (typeof webkitAudioContext !== "undefined") {
@@ -24,7 +16,7 @@ export var vizualizer = {
         this.analyser = this.audioContext.createAnalyser();
         this.audioSrc.connect(this.analyser);
         this.audioSrc.connect(this.audioContext.destination);
-        this.dataArray = new Uint8Array(DataLength);
+        this.dataArray = new Uint8Array(dataLength);
         this.frequencyData = this.analyser.getByteFrequencyData(this.dataArray);
         this.width = document.getElementsByTagName("body")[0].clientWidth;
         this.height = document.getElementsByTagName("body")[0].clientHeight;
@@ -32,36 +24,33 @@ export var vizualizer = {
         this.svg = d3.select("body").append("svg")
             .attr("width", this.width)
             .attr("height", this.height);
-    },
+    }
 
-    //Bar Visualizer
+    // Bar Vizualizer
 
-    initBars: function (barNumber) {
-        "use strict";
+    initBars(barNumber) {
         this.barNumber = barNumber;
         this.bars = this.svg.selectAll("rect").data(this.dataArray).enter().append("rect");
         this.bars.attr("width", this.width / this.barNumber)
             .attr("y", this.height / 2)
             .attr("x", function (data, i) { return (this.width / this.barNumber * i); }.bind(this))
             .attr("style", "fill:#000;");
-        //.attr("transform",  "scale(1, -1) translate(0, -" + this.height + ")");
-    },
-    setAttributeBars: function (attribut, value) {
-        "use strict";
+    }
+
+    setAttributeBars(attribut, value) {
         this.bars.attr(attribut, value);
-    },
-    renderBars: function () {
-        "use strict";
+    }
+
+    renderBars() {
         this.analyser.getByteFrequencyData(this.dataArray);
         this.bars.data(this.dataArray)
             .attr("height", function (data) { return (1 + 0.5 * this.height * data / 255); }.bind(this))
             .attr("style", function (data) { return "fill: rgb(" + 125 + "," + (255 - data) + "," + data + ");"; });
-    },
+    }
 
-    //Star Visualizer
+    // Star Visualizer
 
-    initStars: function (starsNumber) {
-        "use strict";
+    initStars(starsNumber) {
         this.starsNumber = starsNumber;
         this.stars = this.svg.selectAll("circle")
             .data(this.dataArray)
@@ -70,29 +59,25 @@ export var vizualizer = {
         this.stars.attr("cx", function (data) { return Math.random() * this.width; }.bind(this))
             .attr("cy", function (data) { return Math.random() * this.height; }.bind(this))
             .attr("fill", "#fff");
-    },
-    setAttributeStars: function (attribut, value) {
-        "use strict";
+    }
+
+    setAttributeStars(attribut, value) {
         this.stars.attr(attribut, value);
-    },
-    renderStars: function () {
-        "use strict";
+    }
+
+    renderStars() {
         this.analyser.getByteFrequencyData(this.dataArray);
         this.stars.data(this.dataArray)
             .attr("style", function (data) { return "opacity:" + data / 255 + ";"; })
             .attr("r", function (data) { return data / 255 * 10; });
-    },
+    }
 
-    //Text Visualizer
+    // Text Visualizer
 
-    initText: function (text, y, x) {
-        "use strict";
-        if (typeof (x) === "undefined") {
-            x = this.width / 2;
-        }
-        if (typeof (y) === "undefined") {
-            y = this.height / 2;
-        }
+    initText(text, y, x) {
+        x = x || this.width / 2;
+        y = y || this.height / 2;
+
         this.text = this.svg.append("text")
             .data(this.dataArray)
             .text(text)
@@ -102,22 +87,21 @@ export var vizualizer = {
             .attr("text-anchor", "middle")
             .attr("x", x)
             .attr("y", y);
-    },
-    setAttributeText: function (attribut, value) {
-        "use strict";
+    }
+
+    setAttributeText(attribut, value) {
         this.text.attr(attribut, value);
-    },
-    renderText: function () {
-        "use strict";
+    }
+
+    renderText() {
         this.analyser.getByteFrequencyData(this.dataArray);
         this.text.data(this.dataArray)
             .attr("font-size", 50 + d3.mean(this.dataArray) * 0.5 * this.height / 255);
-    },
+    }
 
     //Circle Visualizer
 
-    initCircle: function () {
-        "use strict";
+    initCircle() {
         this.circle = this.svg.append("circle")
             .data(this.dataArray)
             .attr("cx", this.width / 2)
@@ -126,33 +110,26 @@ export var vizualizer = {
             .attr("stroke", "#fff")
             .attr("fill", "none")
             .attr("opacity", "0.7");
-    },
-    setAttributeCircle: function (attribut, value) {
-        "use strict";
+    }
+
+    setAttributeCircle(attribut, value) {
         this.circle.attr(attribut, value);
-    },
-    renderCircle: function () {
-        "use strict";
+    }
+
+    renderCircle() {
         this.analyser.getByteFrequencyData(this.dataArray);
         this.circle.data(this.dataArray)
             .attr("r", 150 + d3.mean(this.dataArray) * 0.5 * this.height / 255);
-    },
+    }
 
     //Image Visualizer
-    initImage: function (href, width, height, x, y) {
-        "use strict";
-        if (typeof (width) === "undefined") {
-            width = this.width / 2;
-        }
-        if (typeof (height) === "undefined") {
-            height = this.height / 2;
-        }
-        if (typeof (x) === "undefined") {
-            x = this.width / 4;
-        }
-        if (typeof (y) === "undefined") {
-            y = this.height / 4;
-        }
+
+    initImage(href, width, height, x, y) {
+        width = width || this.width / 2;
+        height = height || this.height / 2;
+        x = x || this.width / 4;
+        y = y || this.height / 4;
+
         this.image = this.svg.append("image")
             .data(this.dataArray)
             .attr("x", x)
@@ -165,47 +142,42 @@ export var vizualizer = {
         this.image.y = y;
         this.image.width = width;
         this.image.height = height;
-    },
-    setAttributeImage: function (attribut, value) {
-        "use strict";
+    }
+
+    setAttributeImage(attribut, value) {
         this.image.attr(attribut, value);
-    },
-    renderImage: function () {
-        "use strict";
-        var scaleCoeff;
-        scaleCoeff = 1 + d3.mean(this.dataArray) / 255;
+    }
+
+    renderImage() {
+        const scaleCoeff = 1 + d3.mean(this.dataArray) / 255;
         this.analyser.getByteFrequencyData(this.dataArray);
         this.image.data(this.dataArray)
             .attr("transform", "scale(" + scaleCoeff + ")")
             .attr("x", this.image.x - (this.image.width * scaleCoeff - this.image.width) / scaleCoeff)
             .attr("y", this.image.y - (this.image.height * scaleCoeff - this.image.height) / scaleCoeff);
-    },
+    }
 
     //Vizualizer Functions
 
-    changeAudio: function (src) {
-        "use strict";
+    changeAudio(src) {
         this.audioElement.setAttribute("src", src);
-    },
-    start: function () {
-        "use strict";
-        //this.audioElement.play();
-        requestAnimationFrame(this.renderFunction);
-    },
-    stop: function () {
-        "use strict";
-        this.audioElement.pause();
-    },
-    setRenderFunction: function (renderFunction) {
-        "use strict";
-        this.renderFunction = renderFunction;
+    }
 
-    },
+    start() {
+        requestAnimationFrame(this.renderFunction);
+    }
+
+    stop() {
+        this.audioElement.pause();
+    }
+
+    setRenderFunction(renderFunction) {
+        this.renderFunction = renderFunction;
+    }
 
     // A Little Story
 
-    releaseHeart: function () {
-        "use strict";
+    releaseHeart() {
         this.heart = this.svg
             .selectAll("image")
             .data(this.dataArray)
@@ -244,12 +216,11 @@ export var vizualizer = {
             .attr("width", this.width * 5)
             .attr("height", this.height * 5)
             .duration(5000);
-    },
-    releaseCircles: function () {
-        "use strict";
-        var i, radius;
-        i = 0;
-        radius = 150 + 255 * 0.5 * this.height / 255;
+    }
+
+    releaseCircles() {
+        const i = 0;
+        const radius = 150 + 255 * 0.5 * this.height / 255;
 
         this.circles = this.svg
             .append("circle")
@@ -260,6 +231,7 @@ export var vizualizer = {
             .attr("fill", "none")
             .attr("opacity", "0")
             .attr("r", 50);
+
         this.circles
             .transition()
             .attr("opacity", 1)
@@ -348,10 +320,9 @@ export var vizualizer = {
             .attr("opacity", 0)
             .attr("r", radius)
             .duration(500);
-    },
-    releaseColorSquare: function () {
-        "use strict";
+    }
 
+    releaseColorSquare() {
         this.colorSquare = this.svg.append("rect")
             .attr("x", this.width + 150)
             .attr("y", this.height / 2 - 100)
@@ -362,16 +333,15 @@ export var vizualizer = {
         this.colorSquare.transition()
             .attr("x", this.width / 2 + 100)
             .duration(10000);
-        //.ease("linear");
-    },
-    changeColorSquareColor: function (color, duration) {
-        "use strict";
+    }
+
+    changeColorSquareColor(color, duration) {
         this.colorSquare.transition()
             .style("fill", color)
             .duration(duration);
-    },
-    startColorSquareBoom: function () {
-        "use strict";
+    }
+
+    startColorSquareBoom() {
         this.colorSquare.transition()
             .style("fill", "#9FFF6D")
             .attr("y", this.height / 2 - 125)
@@ -405,11 +375,10 @@ export var vizualizer = {
             .transition()
             .attr("opacity", 0)
             .duration(500);
-    },
+    }
 
-    createMainCharacter: function () {
-        "use strict";
-        var text;
+    createMainCharacter() {
+        let text;
         this.man = {};
         this.man.headXpos = this.width / 2;
         this.man.headYpos = this.height / 2 - 100;
@@ -470,14 +439,16 @@ export var vizualizer = {
             .attr("stroke", "#000")
             .attr("stroke-width", 2)
             .attr("fill", "#f0f0f0");
-    },
-    fadeManSpeech: function (duration) {
+    }
+
+    fadeManSpeech(duration) {
         "use strict";
         this.man.speech.transition()
             .attr("opacity", "0")
             .duration(duration);
-    },
-    fadeMan: function (duration) {
+    }
+
+    fadeMan(duration) {
         "use strict";
         this.man.head.transition()
             .attr("opacity", "0")
@@ -494,8 +465,9 @@ export var vizualizer = {
         this.man.rightEye.transition()
             .attr("opacity", "0")
             .duration(duration);
-    },
-    appearMan: function (duration) {
+    }
+
+    appearMan(duration) {
         "use strict";
         this.man.head.transition()
             .attr("opacity", "1")
@@ -512,9 +484,9 @@ export var vizualizer = {
         this.man.rightEye.transition()
             .attr("opacity", "1")
             .duration(duration);
-    },
-    getReadyMan: function () {
-        "use strict";
+    }
+
+    getReadyMan() {
         this.man.head
             .transition()
             .attr("transform", "translate(50, 0)")
@@ -578,9 +550,9 @@ export var vizualizer = {
             .attr("transform", "translate(" + (this.width - this.man.headXpos + 40) + "," + (this.height - this.man.headYpos - 100) + ")")
             .duration(1000)
             .ease("linear");
-    },
-    startMainCharacter: function () {
-        "use strict";
+    }
+
+    startMainCharacter() {
         this.man.head
             .transition()
             .attr("transform", "translate(" + (this.width - this.man.headXpos - 100) + "," + (this.height - this.man.headYpos - 100) + ")")
@@ -608,6 +580,4 @@ export var vizualizer = {
             .ease("linear");
     }
 
-
-
-};
+}

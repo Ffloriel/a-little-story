@@ -1,10 +1,10 @@
-import { vizualizer } from './vizualizer0.3';
+import Vizualizer from './vizualizer0.3';
 import littlestar from './../audio/12-little-star.mp3';
 
-let n = 512,
+let n = 1024,
     i = 0;
 
-vizualizer.init("audio1", n);
+const vizualizer = new Vizualizer("audio1", n);
 vizualizer.initBars(100);
 vizualizer.initStars(n);
 vizualizer.initText("Have a good day");
