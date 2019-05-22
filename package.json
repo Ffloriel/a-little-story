@@ -1,0 +1,26 @@
+{
+  "name": "a-little-story",
+  "version": "1.0.0",
+  "description": "A little story is a little experimentation with svg and sound. I made this in May 2015.   Performance has been left aside and the code is not really pretty but it is a little  experimentation that I enjoy enough to share.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parcel index.pug",
+    "build": "parcel build index.pug",
+    "start": "serve dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ffloriel/a-little-story.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ffloriel/a-little-story/issues"
+  },
+  "homepage": "https://github.com/Ffloriel/a-little-story#readme",
+  "devDependencies": {
+    "cssnano": "^4.1.10",
+    "pug": "^2.0.3"
+  }
+}
