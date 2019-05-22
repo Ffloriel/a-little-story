@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "parcel index.pug",
-    "build": "parcel build index.pug",
+    "build": "parcel build index.pug --public-url /a-little-story/ -d docs",
     "start": "serve dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
